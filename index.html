@@ -12,11 +12,6 @@
     textarea { font-family: monospace; width: 100%; }
     .ui-col { flex: 1; min-width: 360px; }
   </style>
-
-  <!-- defer keeps order; main.js defines $ and wiring after DOM ready -->
-  <script src="./model1.js" defer></script>
-  <script src="./model2.js" defer></script>
-  <script src="./main.js" defer></script>
 </head>
 
 <body>
@@ -24,68 +19,72 @@
 
 <div style="display:flex; gap:12px; align-items:flex-start;">
 
-  <!-- ================= LEFT: INPUTS (stacked) ================= -->
+  <!-- LEFT -->
   <div style="width:420px;">
 
     <h3>Input: Model 1 (PSSC JSON)</h3>
-    <input id="fileInput1" type="file" accept=".json" style="display:none;">
-    <textarea id="jsonInput" rows="14"></textarea>
-    <div style="margin-top:6px; display:flex; gap:6px;">
-      <button id="renderBtn" type="button">Render Model 1</button>
-      <button id="loadSampleBtn1" type="button">Load sample</button>
-      <button id="uploadJsonBtn1" type="button">Upload JSON</button>
+
+    <div style="display:flex; gap:6px; margin-bottom:6px;">
+      <select id="sampleSelect1" style="flex:1;">
+        <option value="">-- Select sample --</option>
+        <option value="./samples/model1_pssc_example.json">Example</option>
+        <option value="./samples/model1_pssc_caseA.json">Case A</option>
+      </select>
     </div>
-    <div id="jsonError" style="color:red; margin-top:6px;"></div>
-    <div id="sampleError1" style="color:red; margin-top:6px;"></div>
+
+    <textarea id="jsonInput" rows="14"></textarea>
+    <div style="margin-top:6px;">
+      <button id="renderBtn">Render Model 1</button>
+    </div>
+    <div id="jsonError" style="color:red;"></div>
+    <div id="sampleError1" style="color:red;"></div>
 
     <hr>
 
     <h3>Input: Model 2 (qPS4 JSON)</h3>
-    <input id="fileInput2" type="file" accept=".json" style="display:none;">
-    <textarea id="qps4Input" rows="10"></textarea>
-    <div style="margin-top:6px; display:flex; gap:6px;">
-      <button id="renderQps4Btn" type="button">Render Model 2</button>
-      <button id="loadSampleBtn2" type="button">Load sample</button>
-      <button id="uploadJsonBtn2" type="button">Upload JSON</button>
+
+    <div style="display:flex; gap:6px; margin-bottom:6px;">
+      <select id="sampleSelect2" style="flex:1;">
+        <option value="">-- Select sample --</option>
+        <option value="./samples/model2_qps4_example.json">Example</option>
+        <option value="./samples/model2_qps4_caseA.json">Case A</option>
+      </select>
     </div>
-    <div id="qps4Error" style="color:red; margin-top:6px;"></div>
-    <div id="sampleError2" style="color:red; margin-top:6px;"></div>
+
+    <textarea id="qps4Input" rows="10"></textarea>
+    <div style="margin-top:6px;">
+      <button id="renderQps4Btn">Render Model 2</button>
+    </div>
+    <div id="qps4Error" style="color:red;"></div>
+    <div id="sampleError2" style="color:red;"></div>
 
   </div>
 
-  <!-- ================= RIGHT: OUTPUTS ================= -->
+  <!-- RIGHT -->
   <div style="flex:1;">
 
     <h3>Output</h3>
 
-    <!-- ===== UI1 + UI2 side-by-side ===== -->
-    <div style="display:flex; gap:12px; align-items:flex-start;">
+    <div style="display:flex; gap:12px;">
 
-      <!-- ===== UI 1: Model 1 ===== -->
       <div class="ui-col">
         <h3>UI 1: PSSC trigger tool</h3>
-
-        <h4>Risk Factors</h4>
         <div><b>Derived present:</b> <span id="rfDerived"></span></div>
         <div id="riskFactors"></div>
 
         <hr>
 
-        <h4>Alert Signs</h4>
         <div><b>Derived alert count:</b> <span id="asDerivedCount"></span></div>
         <div id="alertSigns"></div>
 
         <hr>
 
-        <h4>Sepsis Risk</h4>
         <div><b>Risk:</b> <span id="sepsisRisk"></span></div>
         <div id="triggerBlock">
-          <b>High risk due to:</b>
           <ul id="sepsisTriggers"></ul>
         </div>
       </div>
 
-      <!-- ===== UI 2: Model 2 ===== -->
       <div class="ui-col">
         <h3>UI 2: qPS4</h3>
         <div id="qps4Result"></div>
@@ -95,16 +94,16 @@
 
     <hr>
 
-    <!-- ===== Summary ===== -->
     <h3>Summary</h3>
-    <div style="display:flex; gap:6px; margin-bottom:6px;">
-      <button id="fillBtn" type="button">帶入</button>
-      <button id="clearSummaryBtn" type="button">清空</button>
-    </div>
+    <button id="fillBtn">帶入</button>
+    <button id="clearSummaryBtn">清空</button>
     <textarea id="summary" rows="16"></textarea>
 
   </div>
 </div>
 
+<script defer src="./model1.js"></script>
+<script defer src="./model2.js"></script>
+<script defer src="./main.js"></script>
 </body>
 </html>
