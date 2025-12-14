@@ -1,47 +1,91 @@
+// main.js (non-module) - dropdown auto load+render, no auto-load on page open
 (() => {
   const $ = id => document.getElementById(id);
 
-  async function load(path) {
+  async function loadSample(path) {
     const r = await fetch(path);
     return await r.text();
   }
 
-  $("sampleSelect1").onchange = async () => {
-    const p = $("sampleSelect1").value;
-    if (!p) return;
-    $("jsonInput").value = await load(p);
-    Model1.setState(JSON.parse($("jsonInput").value));
-    Model1.renderAll($);
-  };
-
-  $("sampleSelect2").onchange = async () => {
-    const p = $("sampleSelect2").value;
-    if (!p) return;
-    $("qps4Input").value = await load(p);
-    Model2.setState(JSON.parse($("qps4Input").value));
-    Model2.render($);
-  };
-
+  // ===== Model 1: Render from textarea =====
   $("renderBtn").onclick = () => {
-    Model1.setState(JSON.parse($("jsonInput").value || "{}"));
-    Model1.renderAll($);
+    $("summary").value = "";
+    try {
+      const txt = $("jsonInput").value || "{}";
+      Model1.setState(JSON.parse(txt));
+      Model1.renderAll($);
+      $("jsonError").textContent = "";
+    } catch (e) {
+      $("jsonError").textContent = "JSON parse error: " + e.message;
+    }
   };
 
+  // ===== Model 1: Dropdown change -> load + render =====
+  $("sampleSelect1").onchange = () => {
+    const path = $("sampleSelect1").value;
+    if (!path) return;
+
+    $("summary").value = "";
+    $("sampleError1").textContent = "";
+
+    loadSample(path)
+      .then(txt => {
+        $("jsonInput").value = txt;
+        Model1.setState(JSON.parse(txt || "{}"));
+        Model1.renderAll($);
+        $("jsonError").textContent = "";
+      })
+      .catch(e => {
+        $("sampleError1").textContent = String(e);
+      });
+  };
+
+  // ===== Model 2: Render from textarea =====
   $("renderQps4Btn").onclick = () => {
-    Model2.setState(JSON.parse($("qps4Input").value || "{}"));
-    Model2.render($);
+    $("summary").value = "";
+    try {
+      const txt = $("qps4Input").value || "{}";
+      Model2.setState(JSON.parse(txt));
+      Model2.render($);
+      $("qps4Error").textContent = "";
+    } catch (e) {
+      $("qps4Error").textContent = "JSON parse error: " + e.message;
+    }
   };
 
+  // ===== Model 2: Dropdown change -> load + render =====
+  $("sampleSelect2").onchange = () => {
+    const path = $("sampleSelect2").value;
+    if (!path) return;
+
+    $("summary").value = "";
+    $("sampleError2").textContent = "";
+
+    loadSample(path)
+      .then(txt => {
+        $("qps4Input").value = txt;
+        Model2.setState(JSON.parse(txt || "{}"));
+        Model2.render($);
+        $("qps4Error").textContent = "";
+      })
+      .catch(e => {
+        $("sampleError2").textContent = String(e);
+      });
+  };
+
+  // ===== Summary =====
   $("fillBtn").onclick = () => {
-    $("summary").value =
-      Model1.buildSummaryText() + "\n\n" + Model2.buildSummaryText();
+    let text = Model1.buildSummaryText();
+    const m2 = Model2.buildSummaryText();
+    if (m2) text += "\n\n" + m2;
+    $("summary").value = text;
   };
 
   $("clearSummaryBtn").onclick = () => {
     $("summary").value = "";
   };
 
-  // init: no auto load
+  // ===== init: render empty UIs (no auto sample load) =====
   Model1.setState({});
   Model1.renderAll($);
   Model2.setState(null);
