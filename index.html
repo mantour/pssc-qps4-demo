@@ -6,7 +6,7 @@
   <title>PSSC + qPS4 Demo</title>
 
   <style>
-    table { font-size: 12px; border-collapse: collapse; }
+    table { font-size: 12px; border-collapse: collapse; width: 100%; }
     th, td { padding: 4px; border: 1px solid #999; vertical-align: top; }
     input { font-size: 12px; padding: 2px; }
     textarea { font-family: monospace; width: 100%; }
@@ -19,70 +19,63 @@
 
 <div style="display:flex; gap:12px; align-items:flex-start;">
 
-  <!-- ================= LEFT: INPUTS (stacked) ================= -->
+  <!-- LEFT -->
   <div style="width:420px;">
 
     <h3>Input: Model 1 (PSSC JSON)</h3>
-
-    <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
-      <select id="sampleSelect1" style="flex:1; font-size:12px;">
-        <option value="">-- Select sample --</option>
-        <option value="./samples/model1_pssc_example.json">PSSC example 1</option>
-        <option value="./samples/model1_pssc_example_2.json">PSSC example 2</option>
-        <option value="./samples/model1_pssc_example_3.json">PSSC example 3</option>
-      </select>
-    </div>
+    <select id="sampleSelect1">
+      <option value="">-- Select sample --</option>
+      <option value="./samples/model1_pssc_example.json">example 1</option>
+      <option value="./samples/model1_pssc_example_2.json">example 2</option>
+      <option value="./samples/model1_pssc_example_3.json">example 3</option>
+    </select>
 
     <textarea id="jsonInput" rows="14"></textarea>
-    <div style="margin-top:6px; display:flex; gap:6px;">
-      <button id="renderBtn" type="button">Render Model 1</button>
-    </div>
-    <div id="jsonError" style="color:red; margin-top:6px;"></div>
-    <div id="sampleError1" style="color:red; margin-top:6px;"></div>
+    <button id="renderBtn">Render Model 1</button>
+    <div id="jsonError" style="color:red"></div>
 
     <hr>
 
     <h3>Input: Model 2 (qPS4 JSON)</h3>
-
-    <div style="display:flex; gap:6px; align-items:center; margin-bottom:6px;">
-      <select id="sampleSelect2" style="flex:1; font-size:12px;">
-        <option value="">-- Select sample --</option>
-        <option value="./samples/model2_qps4_example.json">qPS4 example</option>
-      </select>
-    </div>
+    <select id="sampleSelect2">
+      <option value="">-- Select sample --</option>
+      <option value="./samples/model2_qps4_example.json">qPS4 example</option>
+    </select>
 
     <textarea id="qps4Input" rows="10"></textarea>
-    <div style="margin-top:6px; display:flex; gap:6px;">
-      <button id="renderQps4Btn" type="button">Render Model 2</button>
-    </div>
-    <div id="qps4Error" style="color:red; margin-top:6px;"></div>
-    <div id="sampleError2" style="color:red; margin-top:6px;"></div>
+    <button id="renderQps4Btn">Render Model 2</button>
+    <div id="qps4Error" style="color:red"></div>
 
   </div>
 
-  <!-- ================= RIGHT: OUTPUTS ================= -->
+  <!-- RIGHT -->
   <div style="flex:1;">
 
     <h3>Output</h3>
 
-    <!-- ===== UI1 + UI2 side-by-side ===== -->
-    <div style="display:flex; gap:12px; align-items:flex-start;">
+    <div style="display:flex; gap:12px;">
 
-      <!-- ===== UI 1: Model 1 ===== -->
+      <!-- UI 1 -->
       <div class="ui-col">
         <h3>UI 1: PSSC trigger tool</h3>
 
         <h4>Risk Factors</h4>
         <div><b>Derived present:</b> <span id="rfDerived"></span></div>
-        <div id="riskFactors"></div>
-
-        <hr>
+        <table>
+          <thead>
+            <tr><th>present</th><th>item</th><th>value</th><th>time</th><th>description</th></tr>
+          </thead>
+          <tbody id="riskFactorsBody"></tbody>
+        </table>
 
         <h4>Alert Signs</h4>
         <div><b>Derived alert count:</b> <span id="asDerivedCount"></span></div>
-        <div id="alertSigns"></div>
-
-        <hr>
+        <table>
+          <thead>
+            <tr><th>present</th><th>item</th><th>value</th><th>time</th><th>criteria</th></tr>
+          </thead>
+          <tbody id="alertSignsBody"></tbody>
+        </table>
 
         <h4>Sepsis Risk</h4>
         <div><b>Risk:</b> <span id="sepsisRisk"></span></div>
@@ -92,28 +85,31 @@
         </div>
       </div>
 
-      <!-- ===== UI 2: Model 2 ===== -->
+      <!-- UI 2 -->
       <div class="ui-col">
         <h3>UI 2: qPS4</h3>
-        <div id="qps4Result"></div>
+        <table>
+          <thead>
+            <tr><th>Component</th><th>Point</th><th>Value</th><th>Criteria</th></tr>
+          </thead>
+          <tbody id="qps4TableBody"></tbody>
+        </table>
+        <div><b>Total qPS4:</b> <span id="qps4Total"></span></div>
+        <div><b>Septic shock risk:</b> <span id="qps4Risk"></span></div>
       </div>
 
     </div>
 
     <hr>
 
-    <!-- ===== Summary ===== -->
     <h3>Summary</h3>
-    <div style="display:flex; gap:6px; margin-bottom:6px;">
-      <button id="fillBtn" type="button">帶入</button>
-      <button id="clearSummaryBtn" type="button">清空</button>
-    </div>
+    <button id="fillBtn">帶入</button>
+    <button id="clearSummaryBtn">清空</button>
     <textarea id="summary" rows="16"></textarea>
 
   </div>
 </div>
 
-<!-- non-module load order matters; defer preserves order -->
 <script defer src="./model1.js"></script>
 <script defer src="./model2.js"></script>
 <script defer src="./main.js"></script>
