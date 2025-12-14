@@ -13,8 +13,10 @@
     .ui-col { flex: 1; min-width: 360px; }
   </style>
 
-  <!-- ES module entry -->
-  <script type="module" src="./main.js"></script>
+  <!-- defer keeps order; main.js defines $ and wiring after DOM ready -->
+  <script src="./model1.js" defer></script>
+  <script src="./model2.js" defer></script>
+  <script src="./main.js" defer></script>
 </head>
 
 <body>
@@ -29,12 +31,12 @@
     <input id="fileInput1" type="file" accept=".json" style="display:none;">
     <textarea id="jsonInput" rows="14"></textarea>
     <div style="margin-top:6px; display:flex; gap:6px;">
-      <button id="renderBtn" type="button">Render</button>
+      <button id="renderBtn" type="button">Render Model 1</button>
       <button id="loadSampleBtn1" type="button">Load sample</button>
       <button id="uploadJsonBtn1" type="button">Upload JSON</button>
     </div>
     <div id="jsonError" style="color:red; margin-top:6px;"></div>
-    <div id="repoLoadError1" style="color:red; margin-top:6px;"></div>
+    <div id="sampleError1" style="color:red; margin-top:6px;"></div>
 
     <hr>
 
@@ -42,12 +44,12 @@
     <input id="fileInput2" type="file" accept=".json" style="display:none;">
     <textarea id="qps4Input" rows="10"></textarea>
     <div style="margin-top:6px; display:flex; gap:6px;">
-      <button id="renderQps4Btn" type="button">Render</button>
+      <button id="renderQps4Btn" type="button">Render Model 2</button>
       <button id="loadSampleBtn2" type="button">Load sample</button>
       <button id="uploadJsonBtn2" type="button">Upload JSON</button>
     </div>
     <div id="qps4Error" style="color:red; margin-top:6px;"></div>
-    <div id="repoLoadError2" style="color:red; margin-top:6px;"></div>
+    <div id="sampleError2" style="color:red; margin-top:6px;"></div>
 
   </div>
 
@@ -94,4 +96,15 @@
     <hr>
 
     <!-- ===== Summary ===== -->
-    <h3>Summary</h3
+    <h3>Summary</h3>
+    <div style="display:flex; gap:6px; margin-bottom:6px;">
+      <button id="fillBtn" type="button">帶入</button>
+      <button id="clearSummaryBtn" type="button">清空</button>
+    </div>
+    <textarea id="summary" rows="16"></textarea>
+
+  </div>
+</div>
+
+</body>
+</html>
