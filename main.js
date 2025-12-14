@@ -1,91 +1,41 @@
-// main.js (non-module) - dropdown auto load+render, no auto-load on page open
 (() => {
   const $ = id => document.getElementById(id);
 
-  async function loadSample(path) {
-    const r = await fetch(path);
-    return await r.text();
-  }
+  async function load(path){ return (await fetch(path)).text(); }
 
-  // ===== Model 1: Render from textarea =====
+  $("sampleSelect1").onchange = async () => {
+    if (!$("sampleSelect1").value) return;
+    const txt = await load($("sampleSelect1").value);
+    $("jsonInput").value = txt;
+    Model1.setState(JSON.parse(txt));
+    Model1.renderAll($);
+  };
+
+  $("sampleSelect2").onchange = async () => {
+    if (!$("sampleSelect2").value) return;
+    const txt = await load($("sampleSelect2").value);
+    $("qps4Input").value = txt;
+    Model2.setState(JSON.parse(txt));
+    Model2.render($);
+  };
+
   $("renderBtn").onclick = () => {
-    $("summary").value = "";
-    try {
-      const txt = $("jsonInput").value || "{}";
-      Model1.setState(JSON.parse(txt));
-      Model1.renderAll($);
-      $("jsonError").textContent = "";
-    } catch (e) {
-      $("jsonError").textContent = "JSON parse error: " + e.message;
-    }
+    Model1.setState(JSON.parse($("jsonInput").value||"{}"));
+    Model1.renderAll($);
   };
 
-  // ===== Model 1: Dropdown change -> load + render =====
-  $("sampleSelect1").onchange = () => {
-    const path = $("sampleSelect1").value;
-    if (!path) return;
-
-    $("summary").value = "";
-    $("sampleError1").textContent = "";
-
-    loadSample(path)
-      .then(txt => {
-        $("jsonInput").value = txt;
-        Model1.setState(JSON.parse(txt || "{}"));
-        Model1.renderAll($);
-        $("jsonError").textContent = "";
-      })
-      .catch(e => {
-        $("sampleError1").textContent = String(e);
-      });
-  };
-
-  // ===== Model 2: Render from textarea =====
   $("renderQps4Btn").onclick = () => {
-    $("summary").value = "";
-    try {
-      const txt = $("qps4Input").value || "{}";
-      Model2.setState(JSON.parse(txt));
-      Model2.render($);
-      $("qps4Error").textContent = "";
-    } catch (e) {
-      $("qps4Error").textContent = "JSON parse error: " + e.message;
-    }
+    Model2.setState(JSON.parse($("qps4Input").value||"{}"));
+    Model2.render($);
   };
 
-  // ===== Model 2: Dropdown change -> load + render =====
-  $("sampleSelect2").onchange = () => {
-    const path = $("sampleSelect2").value;
-    if (!path) return;
-
-    $("summary").value = "";
-    $("sampleError2").textContent = "";
-
-    loadSample(path)
-      .then(txt => {
-        $("qps4Input").value = txt;
-        Model2.setState(JSON.parse(txt || "{}"));
-        Model2.render($);
-        $("qps4Error").textContent = "";
-      })
-      .catch(e => {
-        $("sampleError2").textContent = String(e);
-      });
-  };
-
-  // ===== Summary =====
   $("fillBtn").onclick = () => {
-    let text = Model1.buildSummaryText();
-    const m2 = Model2.buildSummaryText();
-    if (m2) text += "\n\n" + m2;
-    $("summary").value = text;
+    $("summary").value =
+      Model1.buildSummaryText() + "\n\n" + Model2.buildSummaryText();
   };
 
-  $("clearSummaryBtn").onclick = () => {
-    $("summary").value = "";
-  };
+  $("clearSummaryBtn").onclick = () => $("summary").value="";
 
-  // ===== init: render empty UIs (no auto sample load) =====
   Model1.setState({});
   Model1.renderAll($);
   Model2.setState(null);
