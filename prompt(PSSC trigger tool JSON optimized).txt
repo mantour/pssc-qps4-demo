@@ -1,0 +1,199 @@
+You must follow the structured 4-step procedure below when analyzing the medical record (EHR).  
+Do NOT provide a diagnosis.  
+Your job is ONLY to identify risk factors, identify which criteria are abnormal, and determine whether sepsis risk criteria are met.  
+Always output Step 4 using the exact label format so the UI can extract it.
+
+====================================================
+STEP 1-1 — Check Risk Factors (use ALL available EHR)
+====================================================
+Only consider the following conditions as valid risk factors.  
+Do NOT treat any other past history or condition as a risk factor unless it explicitly appears in this list.  
+Ignore conditions not on the list (e.g., prematurity, asthma, allergy, pneumonia, GERD, ASD, ADHD, etc.).
+
+Valid Risk Factor List (strict whitelist):
+- Malignancy  
+- Transplantation (bone marrow or organ)  
+- Immunocompromise (immunodeficiency, immune compromise, or immunosuppression)
+- Asplenia/splenectomy (including sickle cell anemia)  
+- Bedridden
+- Central/implanted catheters: surgically implanted such as Port-A, Hickman, not include temporary catheter such as CVC
+- Long-term ventilator use
+
+If any item appears anywhere in EHR, mark STEP 1 = "Risk factor present".  
+If none appear, mark STEP 1 = "No risk factor".
+
+
+====================================================
+STEP 1-2 — Check Risk Factors (use ALL available EHR)
+====================================================
+
+Review result of step 1, make sure to ignore conditions not on the list (e.g., prematurity, asthma, allergy, pneumonia, GERD, ASD, ADHD, etc.). keep only condition in the list:
+
+Valid Risk Factor List (strict whitelist):
+- Malignancy  
+- Transplantation (bone marrow or organ)  
+- Immunocompromise (immunodeficiency, immune compromise, or immunosuppression)
+- Asplenia/splenectomy (including sickle cell anemia)  
+- Bedridden
+- Central/implanted catheters: surgically implanted such as Port-A, Hickman, not include temporary catheter such as CVC
+- Long-term ventilator use
+
+modify result of step 1-1 and generate final result of step 1
+
+====================================================
+STEP 2 — Check the 8 criteria (ONLY use EHR within past 24 hours)
+====================================================
+Evaluate ONLY records documented within the last 24 hours.  
+For each criterion below, determine whether it is abnormal based on the age-specific threshold.
+use current age to select age-specific criteria
+
+(1) Fever or hypothermia  
+- Abnormal if temperature > 38°C or < 36°C  
+- Or if the chart mentions “fever”, “febrile”, “hypothermia”
+
+(2) Hypotension (age-specific systolic BP thresholds)  
+- Age < 1 month: SBP < 60  
+- Age 1–2 months: SBP < 70  
+- Age 3–11 months: SBP < 70  
+- Age 12–23 months: SBP < 70 + 2 × age(years)  
+- Age 2–3 years: SBP < 70 + 2 × age(years)  
+- Age 4–5 years: SBP < 70 + 2 × age(years)  
+- Age 6–9 years: SBP < 90  
+- Age 10–12 years: SBP < 90  
+- Age ≥ 13 years: SBP < 90
+
+Double check:
+1. record used is within 24hr
+2. age used is the current age
+3. criteria selection is correct
+redo this item if any problem
+
+
+(3) Tachycardia  
+- Age < 1 month: HR > 205  
+- Age 1–2 months: HR > 205  
+- Age 3–11 months: HR > 190  
+- Age 12–23 months: HR > 190  
+- Age 2–3 years: HR > 140  
+- Age 4–5 years: HR > 140  
+- Age 6–9 years: HR > 140  
+- Age 10–12 years: HR > 100  
+- Age ≥ 13 years: HR > 100  
+
+Double check:
+1. record used is within 24hr
+2. age used is the current age
+3. criteria selection is correct
+redo this item if any problem
+
+(4) Tachypnea  
+- Age < 1 month: RR > 60  
+- Age 1–2 months: RR > 60  
+- Age 3–11 months: RR > 60  
+- Age 12–23 months: RR > 40  
+- Age 2–3 years: RR > 40  
+- Age 4–5 years: RR > 34  
+- Age 6–9 years: RR > 30  
+- Age 10–12 years: RR > 30  
+- Age ≥ 13 years: RR > 16  
+
+Double check:
+1. record used is within 24hr
+2. age used is the current age
+3. criteria selection is correct
+redo this item if any problem
+
+(5) Capillary refill time > 2 seconds
+
+(6) Altered mental status  
+Examples: GCS < 15, decreased consciousness, irritability, confusion, inappropriate crying, drowsy, poor interaction, lethargic, diminished arousibility, obtunded, or similar phrases
+
+(7) Abnormal pulse quality  
+If chart mentions: weak pulse, thready pulse, bounding pulse
+
+(8) Skin findings  
+If chart mentions: mottled skin, petechiae, purpura
+
+For each criterion, determine whether it is abnormal (true/false) based on the above rules.
+
+====================================================
+STEP 3 — Determine Sepsis Risk (logic definition only)
+====================================================
+Sepsis risk is considered present if ANY of the following conditions are met:
+
+- Condition (A): Hypotension present (criterion 2 abnormal), OR  
+- Condition (B): STEP 2 has ≥ 3 abnormal criteria, OR  
+- Condition (C): STEP 1 has Risk factor AND STEP 2 has ≥ 2 abnormal criteria
+
+IMPORTANT:
+- Do NOT output any total counts or the final sepsis risk decision.
+- Only ensure STEP 4 outputs enough boolean fields so the UI can compute Condition A/B/C.
+
+====================================================
+STEP 4 — Final Output (MUST be valid JSON)
+====================================================
+
+Output ONLY ONE JSON object, using the exact structure below.
+
+Rules:
+- Do NOT output explanations or comments outside the JSON.
+- Do NOT invent data.
+- Do NOT compute or output any totals, counts, or final sepsis risk.
+- All items MUST be output as structured UI-state objects.
+- If evidence is missing:
+  - present = false
+  - value = null
+  - recorded_at = null
+  - threshold = ""
+
+
+--------------------------------------------------
+Output JSON structure (exact)
+--------------------------------------------------
+
+{
+  "risk_factors": {
+    "items": {
+      "Malignancy": { "present": false, "value": null, "recorded_at": null, "description": "" },
+      "Transplantation": { "present": false, "value": null, "recorded_at": null, "description": "" },
+      "Immunocompromise": { "present": false, "value": null, "recorded_at": null, "description": "" },
+      "Asplenia/splenectomy": { "present": false, "value": null, "recorded_at": null, "description": "" },
+      "Bedridden": { "present": false, "value": null, "recorded_at": null, "description": "" },
+      "Central/implanted catheters": { "present": false, "value": null, "recorded_at": null, "description": "" },
+      "Long-term ventilator use": { "present": false, "value": null, "recorded_at": null, "description": "" }
+    }
+  },
+
+  "alert_signs": {
+    "items": {
+      "Fever or hypothermia": { "present": false, "value": null, "recorded_at": null, "threshold": "" },
+      "Hypotension": { "present": false, "value": null, "recorded_at": null, "threshold": "" },
+      "Tachycardia": { "present": false, "value": null, "recorded_at": null, "threshold": "" },
+      "Tachypnea": { "present": false, "value": null, "recorded_at": null, "threshold": "" },
+      "Abnormal capillary refill": { "present": false, "value": null, "recorded_at": null, "threshold": "" },
+      "Altered mental status": { "present": false, "value": null, "recorded_at": null, "threshold": "" },
+      "Abnormal pulse quality": { "present": false, "value": null, "recorded_at": null, "threshold": "" },
+      "Skin findings": { "present": false, "value": null, "recorded_at": null, "description": "" }
+    }
+  }
+}
+
+--------------------------------------------------
+Population rules (logic unchanged from STEP 1 to STEP 3)
+--------------------------------------------------
+
+A) risk_factors items
+- present is true if the condition is present anywhere in EHR per STEP 1 rules.
+- value is short supporting text if explicitly mentioned; otherwise null.
+- recorded_at is datetime of the evidence if available; otherwise null.
+- description must be a short sentence or phrase.
+
+B) alert_signs items
+- present is true if the criterion is abnormal per STEP 2 rules.
+- value is the numeric measurement or descriptive finding used.
+- recorded_at is the datetime of the record used (to hour and minute if available, must be within past 24 hours if available).
+- threshold must contain real both age and value used, value should not be a formula (age + criteria)
+- description must be a short sentence or phrase.
+
+Final constraint:
+- Output JSON only. No additional text.
