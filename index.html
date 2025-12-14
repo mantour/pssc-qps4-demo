@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PSSC + qPS4 Demo</title>
+
+  <style>
+    table { font-size: 12px; border-collapse: collapse; }
+    th, td { padding: 4px; border: 1px solid #999; vertical-align: top; }
+    textarea { font-family: monospace; width: 100%; }
+    .ui-col { flex: 1; min-width: 360px; }
+  </style>
+
+  <!-- ES module entry -->
+  <script type="module" src="./main.js"></script>
+</head>
+
+<body>
+<h2>PSSC trigger tool + qPS4 demo</h2>
+
+<div style="display:flex; gap:12px; align-items:flex-start;">
+
+  <!-- LEFT -->
+  <div style="width:420px;">
+
+    <h3>Input: Model 1 (PSSC)</h3>
+    <textarea id="jsonInput" rows="12"></textarea>
+
+    <div style="margin-top:6px; display:flex; gap:6px;">
+      <button id="renderBtn">Render</button>
+      <button id="loadSampleBtn1">Load sample</button>
+      <button id="uploadJsonBtn1">Upload JSON</button>
+    </div>
+
+    <input id="fileInput1" type="file" accept=".json" style="display:none;">
+    <div id="jsonError" style="color:red;"></div>
+
+    <hr>
+
+    <h3>Input: Model 2 (qPS4)</h3>
+    <textarea id="qps4Input" rows="10"></textarea>
+
+    <div style="margin-top:6px; display:flex; gap:6px;">
+      <button id="renderQps4Btn">Render</button>
+      <button id="loadSampleBtn2">Load sample</button>
+      <button id="uploadJsonBtn2">Upload JSON</button>
+    </div>
+
+    <input id="fileInput2" type="file" accept=".json" style="display:none;">
+    <div id="qps4Error" style="color:red;"></div>
+  </div>
+
+  <!-- RIGHT -->
+  <div style="flex:1;">
+
+    <div style="display:flex; gap:12px;">
+      <div class="ui-col">
+        <h3>UI 1: PSSC</h3>
+        <div id="riskFactors"></div>
+        <div id="alertSigns"></div>
+        <div><b>Sepsis risk:</b> <span id="sepsisRisk"></span></div>
+        <ul id="sepsisTriggers"></ul>
+      </div>
+
+      <div class="ui-col">
+        <h3>UI 2: qPS4</h3>
+        <div id="qps4Result"></div>
+      </div>
+    </div>
+
+    <hr>
+
+    <h3>Summary</h3>
+    <button id="fillBtn">帶入</button>
+    <button id="clearSummaryBtn">清空</button>
+    <textarea id="summary" rows="14"></textarea>
+  </div>
+</div>
+
+</body>
+</html>
