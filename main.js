@@ -1,63 +1,108 @@
-// main.js
+// main.js (ES module entry)
 import { setModel1State, renderModel1, buildModel1SummaryText } from "./model1.js";
 import { setModel2State, renderModel2, buildModel2SummaryText } from "./model2.js";
 
-const $ = id => document.getElementById(id);
+const $ = (id) => document.getElementById(id);
 
-async function fetchSample(path) {
-  const r = await fetch(path, { cache: "no-store" });
-  if (!r.ok) throw new Error("fetch failed");
-  return r.text();
+async function fetchText(url) {
+  const resp = await fetch(url, { cache: "no-store" });
+  if (!resp.ok) throw new Error(`Fetch failed (${resp.status}): ${url}`);
+  return await resp.text();
 }
 
-function uploadJson(fileInput, textarea, renderFn) {
-  fileInput.click();
-  fileInput.onchange = e => {
-    const f = e.target.files?.[0];
-    if (!f) return;
-    const r = new FileReader();
-    r.onload = ev => {
-      textarea.value = ev.target.result;
-      renderFn();
-    };
-    r.readAsText(f);
+function clearSummary() {
+  $("summary").value = "";
+}
+
+function readLocalFileToTextarea(fileInputEl, textareaEl, onDone) {
+  const f = fileInputEl.files?.[0];
+  if (!f) return;
+  const r = new FileReader();
+  r.onload = (ev) => {
+    textareaEl.value = ev.target.result;
+    onDone();
   };
+  r.readAsText(f);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-
+  // ===== Render Model 1 =====
   $("renderBtn").onclick = () => {
-    const obj = JSON.parse($("jsonInput").value || "{}");
-    setModel1State(obj);
-    renderModel1($);
+    clearSummary();
+    try {
+      const obj = JSON.parse($("jsonInput").value || "{}");
+      setModel1State(obj);
+      renderModel1($);
+      $("jsonError").textContent = "";
+    } catch (e) {
+      $("jsonError").textContent = "JSON parse error: " + e.message;
+    }
   };
 
+  // ===== Render Model 2 =====
   $("renderQps4Btn").onclick = () => {
-    const obj = JSON.parse($("qps4Input").value || "{}");
-    setModel2State(obj);
-    renderModel2($);
+    clearSummary();
+    try {
+      const obj = JSON.parse($("qps4Input").value || "{}");
+      setModel2State(obj);
+      renderModel2($);
+      $("qps4Error").textContent = "";
+    } catch (e) {
+      $("qps4Error").textContent = "JSON parse error: " + e.message;
+    }
   };
 
+  // ===== Load sample (repo) =====
   $("loadSampleBtn1").onclick = async () => {
-    $("jsonInput").value = await fetchSample("./samples/model1_pssc_example.json");
-    $("renderBtn").click();
+    clearSummary();
+    $("repoLoadError1").textContent = "";
+    try {
+      $("jsonInput").value = await fetchText("./samples/model1_pssc_example.json");
+      $("renderBtn").click();
+    } catch (e) {
+      $("repoLoadError1").textContent = String(e?.message || e);
+    }
   };
 
   $("loadSampleBtn2").onclick = async () => {
-    $("qps4Input").value = await fetchSample("./samples/model2_qps4_example.json");
-    $("renderQps4Btn").click();
+    clearSummary();
+    $("repoLoadError2").textContent = "";
+    try {
+      $("qps4Input").value = await fetchText("./samples/model2_qps4_example.json");
+      $("renderQps4Btn").click();
+    } catch (e) {
+      $("repoLoadError2").textContent = String(e?.message || e);
+    }
   };
 
-  $("uploadJsonBtn1").onclick = () =>
-    uploadJson($("fileInput1"), $("jsonInput"), () => $("renderBtn").click());
+  // ===== Upload JSON (local) =====
+  $("uploadJsonBtn1").onclick = () => $("fileInput1").click();
+  $("fileInput1").onchange = () => {
+    clearSummary();
+    readLocalFileToTextarea($("fileInput1"), $("jsonInput"), () => $("renderBtn").click());
+  };
 
-  $("uploadJsonBtn2").onclick = () =>
-    uploadJson($("fileInput2"), $("qps4Input"), () => $("renderQps4Btn").click());
+  $("uploadJsonBtn2").onclick = () => $("fileInput2").click();
+  $("fileInput2").onchange = () => {
+    clearSummary();
+    readLocalFileToTextarea($("fileInput2"), $("qps4Input"), () => $("renderQps4Btn").click());
+  };
 
+  // ===== Summary =====
   $("fillBtn").onclick = () => {
-    $("summary").value =
-      buildModel1SummaryText() + "\n\n" + buildModel2SummaryText();
+    let text = buildModel1SummaryText();
+    const m2 = buildModel2SummaryText();
+    if (m2) text += "\n\n" + m2;
+    $("summary").value = text;
   };
 
-  $("clearSummaryBtn").onclick = () => $("summary").value = "";
+  $("clearSummaryBtn").onclick = () => {
+    $("summary").value = "";
+  };
+
+  // ===== init: render empty UIs =====
+  setModel1State({});
+  renderModel1($);
+  setModel2State(null);
+  renderModel2($);
 });
